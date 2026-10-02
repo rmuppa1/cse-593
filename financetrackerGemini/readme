@@ -1,0 +1,8 @@
+This is a personal finance tracker mobile application with code generated using Gemini 3.8 flash.
+The technologies used to generate the personal finance tracker app are Flutter and Android studio for Android SDK and Emulator.
+
+To run the application
+Open Android studio > under Device Manager > Select pixel 7 Android 14.0 > click on the play button > click on running devices
+
+In the terminal run the following command after downloading all the necessary dependencies.
+Flutter run
