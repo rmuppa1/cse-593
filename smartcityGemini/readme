@@ -1,0 +1,15 @@
+This is a smart city hub web application made using Gemini 3.8 flash.
+The technologies used to generate the smart city hub application are React, Node, Express.js PostgreSQL, Prisma, and JSON web tokens.
+
+Use these commands for Database setup
+cd backend
+npx prisma generate
+npx prisma migrate dev --name init
+
+Use these commands to run the application
+In terminal 1
+    cd backend
+    npm run dev
+In terminal 2
+    cd frontend
+    npm run dev
