@@ -1,0 +1,31 @@
+This is a smart city hub web application with code generated using Gemini 3.8 flash.
+The technologies used to generate the smart city hub application are React, Node, Express.js PostgreSQL, Prisma, and JSON web tokens.
+
+Use these commands for Database setup
+cd backend
+npx prisma generate
+npx prisma migrate dev --name init
+
+Use these commands to run the application
+In terminal 1
+    cd backend
+    npm run dev
+In terminal 2
+    cd frontend
+    npm run dev
+
+The default user login credentials to test the application are below
+email: 'citizen@smartcity.com'
+password: 'password123'
+email: 'admin@smartcity.com'
+password: 'password123'
+email: 'manager@smartcity.com'
+password: 'password123'
+
+A .env file needs to be added in the backend folder with the following content
+DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@localhost:5***/smartcity_gemini"
+JWT_SECRET="YOUR_RANDOM_JWT_SECRET"
+JWT_EXPIRES_IN="7d"
+PORT=5001
+NODE_ENV=development
+CORS_ORIGIN="http://localhost:5***"
