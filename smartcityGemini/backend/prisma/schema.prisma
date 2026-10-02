@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  CITY_ADMIN
+  DEPT_MANAGER
+}
+
+enum EventCategory {
+  COMMUNITY_SERVICE
+  SPORTS
+  PUBLIC_SAFETY
+  EDUCATION
+  ENVIRONMENT
+  CULTURAL
+}
+
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum RequestCategory {
+  BROKEN_STREETLIGHT
+  POTHOLE
+  GRAFFITI
+  WATER_LEAK
+  NOISE_COMPLAINT
+}
+
+enum RequestStatus {
+  SUBMITTED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  password         String
+  name             String
+  role             Role
+  department       String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  events           Event[]
+  serviceRequests  ServiceRequest[] @relation("SubmittedBy")
+  assignedRequests ServiceRequest[] @relation("AssignedTo")
+
+  @@index([email])
+}
+
+model Event {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  category        EventCategory
+  date            DateTime
+  endDate         DateTime?
+  location        String
+  isFree          Boolean       @default(true)
+  price           Float?
+  capacity        Int
+  registeredCount Int           @default(0)
+  imageUrl        String?
+  status          EventStatus
+  createdById     String
+  createdBy       User          @relation(fields: [createdById], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@index([date])
+}
+
+model ServiceRequest {
+  id              String          @id @default(cuid())
+  title           String
+  description     String
+  category        RequestCategory
+  location        String
+  latitude        Float?
+  longitude       Float?
+  status          RequestStatus
+  priority        Priority
+  submittedById   String
+  submittedBy     User            @relation("SubmittedBy", fields: [submittedById], references: [id])
+  assignedToId    String?
+  assignedTo      User?           @relation("AssignedTo", fields: [assignedToId], references: [id])
+  department      String?
+  resolutionNotes String?
+  images          String[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([priority])
+  @@index([department])
+}
