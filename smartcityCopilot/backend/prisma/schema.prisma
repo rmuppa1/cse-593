@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  DEPT_MANAGER
+  CITY_ADMIN
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id                String             @id @default(uuid())
+  name              String
+  email             String             @unique
+  password          String
+  role              Role               @default(CITIZEN)
+  department        String?
+  approvalStatus    ApprovalStatus     @default(APPROVED)
+  lastLogin         DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  eventsCreated     Event[]            @relation("EventCreator")
+  eventRegistrations EventRegistration[]
+  requestsSubmitted ServiceRequest[]   @relation("RequestSubmitter")
+  flagsSubmitted    EventFlag[]        @relation("FlagSubmitter")
+}
+
+enum EventCategory {
+  COMMUNITY_SERVICE
+  SPORTS
+  PUBLIC_SAFETY
+  EDUCATION
+  ENVIRONMENT
+  CULTURAL_ACTIVITIES
+}
+
+model Event {
+  id               String              @id @default(uuid())
+  title            String
+  description      String
+  category         EventCategory
+  date             DateTime
+  location         String
+  isFree           Boolean             @default(true)
+  price            Float?              @default(0)
+  capacity         Int?
+  registeredCount  Int                 @default(0)
+  isBlocked        Boolean             @default(false)
+  createdById      String
+  createdBy        User                @relation("EventCreator", fields: [createdById], references: [id])
+  registrations    EventRegistration[]
+  flags            EventFlag[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+enum FlagStatus {
+  PENDING
+  REVIEWED
+}
+
+model EventFlag {
+  id           String     @id @default(uuid())
+  eventId      String
+  event        Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  flaggedById  String
+  flaggedBy    User       @relation("FlagSubmitter", fields: [flaggedById], references: [id])
+  reason       String
+  status       FlagStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+}
+
+model EventRegistration {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+enum RequestCategory {
+  BROKEN_STREETLIGHT
+  POTHOLE
+  GRAFFITI
+  WATER_LEAK
+  NOISE_COMPLAINT
+  OTHER
+}
+
+enum RequestStatus {
+  SUBMITTED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum RequestPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model ServiceRequest {
+  id               String          @id @default(uuid())
+  title            String
+  description      String
+  category         RequestCategory
+  location         String
+  status           RequestStatus   @default(SUBMITTED)
+  priority         RequestPriority @default(MEDIUM)
+  department       String?
+  resolutionNotes  String?
+  submittedById    String
+  submittedBy      User            @relation("RequestSubmitter", fields: [submittedById], references: [id])
+  assignedToName   String?
+  resolvedAt       DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
