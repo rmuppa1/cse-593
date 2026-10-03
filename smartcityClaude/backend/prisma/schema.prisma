@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  ADMIN
+  MANAGER
+}
+
+enum Department {
+  PUBLIC_WORKS
+  WATER_UTILITIES
+  PARKS_SANITATION
+  PUBLIC_SAFETY
+}
+
+enum FlagStatus {
+  PENDING
+  DISMISSED
+  UPHELD
+}
+
+enum EventCategory {
+  COMMUNITY_SERVICE
+  SPORTS
+  PUBLIC_SAFETY
+  EDUCATION
+  ENVIRONMENT
+  CULTURAL
+}
+
+enum RequestType {
+  STREETLIGHT
+  POTHOLE
+  GRAFFITI
+  WATER_LEAK
+  NOISE
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  role       Role     @default(CITIZEN)
+  department Department?
+  approved   Boolean      @default(false)
+  createdAt  DateTime @default(now())
+
+  requests ServiceRequest[] @relation("ReportedBy")
+  events   Event[]          @relation("CreatedEvents")
+  rsvps    EventRSVP[]
+  flags    EventFlag[]
+}
+
+model Event {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String
+  category    EventCategory
+  location    String
+  date        DateTime
+  isFree      Boolean       @default(true)
+  price       Decimal?      @db.Decimal(10, 2)
+  capacity    Int?
+  blocked     Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  createdById Int
+  createdBy   User        @relation("CreatedEvents", fields: [createdById], references: [id])
+  rsvps       EventRSVP[]
+  flags       EventFlag[]
+
+  @@index([category])
+  @@index([date])
+}
+
+model EventRSVP {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+model ServiceRequest {
+  id          Int           @id @default(autoincrement())
+  type        RequestType
+  title       String
+  description String
+  location    String
+  latitude    Float?
+  longitude   Float?
+  status      RequestStatus @default(PENDING)
+  priority    Priority      @default(MEDIUM)
+  managerNote String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  resolvedAt  DateTime?
+
+  reporterId Int
+  reporter   User  @relation("ReportedBy", fields: [reporterId], references: [id])
+  // Free-text name of whoever was given the task; they need not be a registered user.
+  assigneeName String?
+
+  @@index([status])
+}
+
+// A citizen's private report about an event; only admins can ever read these.
+model EventFlag {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  eventId    Int
+  reason     String
+  status     FlagStatus @default(PENDING)
+  createdAt  DateTime   @default(now())
+  reviewedAt DateTime?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([status])
+}
