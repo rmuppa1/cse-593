@@ -1,0 +1,78 @@
+# ============================================
+# Java & Build Output
+# ============================================
+target/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================
+# Application Runtime & Log Files
+# ============================================
+server.log*
+*.log
+test-server.log*
+
+# ============================================
+# Application Storage & Temporary Artifacts
+# ============================================
+# Ignore uploaded runtime files in storage, but retain folder
+server-storage/*
+!server-storage/welcome.txt
+!server-storage/.gitkeep
+
+# Ignore client downloads or test output
+downloaded-*
+client-upload-test-*
+concurrent-dl.dat
+locked-test.dat
+
+# ============================================
+# IDE & Editor Files
+# ============================================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+
+# ============================================
+# OS Generated Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================
+# Crash / Core Dumps
+# ============================================
+hs_err_pid*
+replay_pid*

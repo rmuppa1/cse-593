@@ -1,0 +1,3 @@
+Welcome to the Multi-Client File and System Information Server!
+This is a sample file placed in the shared storage directory.
+You can download, inspect (INFO), or delete this file via any connected client.
