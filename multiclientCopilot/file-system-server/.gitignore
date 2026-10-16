@@ -1,0 +1,6 @@
+out/
+target/
+server.log
+downloads/
+server-storage/*
+!server-storage/.gitkeep
