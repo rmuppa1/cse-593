@@ -1,0 +1,10 @@
+import { RotateCcw, Search, SlidersHorizontal } from 'lucide-react';
+
+const categories = ['', 'COMMUNITY_SERVICE', 'SPORTS', 'PUBLIC_SAFETY', 'EDUCATION', 'ENVIRONMENT', 'CULTURAL_ACTIVITIES'];
+const pretty = (v) => v ? v.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : 'All categories';
+export default function FilterBar({ filters, setFilters }) {
+  const set = (key) => (e) => setFilters((f) => ({ ...f, [key]: e.target.value }));
+  const clear = () => setFilters({ search: '', category: '', date: '', type: '', cost: '', sort: 'soonest' });
+  return <div className="card p-4"><div className="relative"><Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" /><input className="field !pl-12" placeholder="Search events, places, or activities..." value={filters.search} onChange={set('search')} /></div><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5"><select className="field" value={filters.category} onChange={set('category')}>{categories.map((c) => <option value={c} key={c}>{pretty(c)}</option>)}</select><input className="field" type="date" value={filters.date} onChange={set('date')} /><select className="field" value={filters.type} onChange={set('type')}><option value="">Any format</option><option value="IN_PERSON">In person</option><option value="VIRTUAL">Virtual</option><option value="HYBRID">Hybrid</option></select><select className="field" value={filters.cost} onChange={set('cost')}><option value="">Free or paid</option><option value="free">Free</option><option value="paid">Paid</option></select><select className="field" value={filters.sort} onChange={set('sort')}><option value="soonest">Soonest</option><option value="popular">Most popular</option><option value="newest">Recently added</option></select></div><div className="mt-3 flex items-center justify-between text-xs text-slate-400"><span className="flex items-center gap-1.5"><SlidersHorizontal size={14} />Filter events your way</span><button onClick={clear} className="flex items-center gap-1.5 font-bold text-forest-700"><RotateCcw size={13} />Reset filters</button></div></div>;
+}
+

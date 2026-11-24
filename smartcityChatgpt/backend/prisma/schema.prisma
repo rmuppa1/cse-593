@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  ADMIN
+  MANAGER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum FlagTargetType {
+  EVENT
+  SERVICE_REQUEST
+}
+
+enum FlagStatus {
+  OPEN
+  BLOCKED
+  DISMISSED
+}
+
+enum EventCategory {
+  COMMUNITY_SERVICE
+  SPORTS
+  PUBLIC_SAFETY
+  EDUCATION
+  ENVIRONMENT
+  CULTURAL_ACTIVITIES
+}
+
+enum EventType {
+  IN_PERSON
+  VIRTUAL
+  HYBRID
+}
+
+enum IssueType {
+  BROKEN_STREETLIGHT
+  POTHOLE
+  GRAFFITI
+  WATER_LEAK
+  NOISE_COMPLAINT
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id               String              @id @default(cuid())
+  name             String
+  email            String              @unique
+  password         String
+  role             Role                @default(CITIZEN)
+  department       String?
+  requestedRole    Role                @default(CITIZEN)
+  requestedDepartment String?
+  approvalStatus   ApprovalStatus      @default(PENDING)
+  approvedAt       DateTime?
+  approvedById     String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  createdEvents    Event[]             @relation("EventCreator")
+  serviceRequests  ServiceRequest[]    @relation("RequestCitizen")
+  assignedRequests ServiceRequest[]    @relation("RequestManager")
+  registrations    EventRegistration[]
+  flags            ContentFlag[]
+
+  @@index([approvalStatus, createdAt])
+}
+
+model Event {
+  id            String              @id @default(cuid())
+  title         String
+  description   String
+  category      EventCategory
+  type          EventType           @default(IN_PERSON)
+  location      String
+  address       String?
+  startsAt      DateTime
+  endsAt        DateTime
+  isFree        Boolean             @default(true)
+  price         Decimal?            @db.Decimal(10, 2)
+  capacity      Int?
+  imageUrl      String?
+  featured      Boolean             @default(false)
+  published     Boolean             @default(true)
+  blocked       Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  creatorId     String
+  creator       User                @relation("EventCreator", fields: [creatorId], references: [id])
+  registrations EventRegistration[]
+
+  @@index([category, startsAt])
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+model ServiceRequest {
+  id          String        @id @default(cuid())
+  reference   String        @unique
+  title       String
+  description String
+  issueType   IssueType
+  status      RequestStatus @default(PENDING)
+  priority    Priority      @default(MEDIUM)
+  location    String
+  latitude    Float?
+  longitude   Float?
+  imageUrl    String?
+  citizenId   String
+  managerId   String?
+    assignedToName String?
+  department  String?
+  resolution  String?
+  blocked     Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  resolvedAt  DateTime?
+  citizen     User          @relation("RequestCitizen", fields: [citizenId], references: [id])
+  manager     User?         @relation("RequestManager", fields: [managerId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([managerId])
+}
+
+model ContentFlag {
+  id          String         @id @default(cuid())
+  targetType  FlagTargetType
+  targetId    String
+  reason      String
+  status      FlagStatus     @default(OPEN)
+  adminNote   String?
+  reporterId  String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  reviewedAt  DateTime?
+  reporter    User           @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+}
+

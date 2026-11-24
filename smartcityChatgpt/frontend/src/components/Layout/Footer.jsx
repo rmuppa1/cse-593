@@ -1,0 +1,6 @@
+import { Facebook, Instagram, Mail, MapPin } from 'lucide-react';
+import Logo from './Logo.jsx';
+export default function Footer() {
+  return <footer className="mt-20 bg-forest-900 text-forest-100"><div className="page-wrap grid gap-10 py-14 md:grid-cols-[1.5fr_1fr_1fr]"><div><Logo light /><p className="mt-5 max-w-sm text-sm leading-6 text-forest-100/70">One welcoming place to discover your city, shape your neighborhood, and get the help you need.</p><div className="mt-5 flex gap-3"><span className="rounded-lg bg-white/10 p-2"><Facebook size={17} /></span><span className="rounded-lg bg-white/10 p-2"><Instagram size={17} /></span></div></div><div><h3 className="font-bold text-white">City resources</h3><ul className="mt-4 space-y-3 text-sm text-forest-100/70"><li>Accessibility</li><li>Emergency services</li><li>Open data portal</li><li>Public records</li></ul></div><div><h3 className="font-bold text-white">Contact</h3><p className="mt-4 flex gap-2 text-sm text-forest-100/70"><MapPin size={17} /> City Hall, 1 Civic Plaza</p><p className="mt-3 flex gap-2 text-sm text-forest-100/70"><Mail size={17} /> hello@smartcity.gov</p></div></div><div className="border-t border-white/10 py-5 text-center text-xs text-forest-100/50">© {new Date().getFullYear()} SmartCity Hub · Built for everyone who calls our city home.</div></footer>;
+}
+
