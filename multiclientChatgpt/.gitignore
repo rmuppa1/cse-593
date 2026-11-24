@@ -1,0 +1,8 @@
+target/
+out/
+.m2repo/
+logs/
+shared/
+.idea/
+*.iml
+.vscode/
